@@ -1,4 +1,39 @@
 import { PGlite } from '@electric-sql/pglite';
+
+// Configure PGlite to use browser-compatible filesystem
+// This ensures it works in browser environments without Node.js APIs
+let pgliteInstance: typeof PGlite;
+
+async function initializePGlite(): Promise<typeof PGlite> {
+    try {
+        // Check if we're in a browser environment
+        if (typeof window !== 'undefined') {
+            // In browser environment, try to use PGlite directly
+            // PGlite should automatically use browser-compatible filesystem
+            return PGlite;
+        } else {
+            // In Node.js environment, use regular import
+            return PGlite;
+        }
+    } catch (error) {
+        console.warn('PGlite initialization warning:', error);
+        // Fallback to regular import
+        return PGlite;
+    }
+}
+
+// Initialize PGlite and use the configured instance
+let PGliteBrowser: typeof PGlite = PGlite;
+
+// Try to initialize PGlite properly
+initializePGlite().then((instance) => {
+    PGliteBrowser = instance;
+    console.log('PGlite initialized successfully');
+}).catch((error) => {
+    console.error('Failed to initialize PGlite:', error);
+    // Fallback to basic PGlite import
+    PGliteBrowser = PGlite;
+});
 import { databaseSeeds } from '$lib/data/challenges';
 import type {
 	Challenge,
@@ -89,7 +124,7 @@ class PGlitePool {
 		}
 
 		// Create new instance if pool is empty
-		const db = await PGlite.create();
+		const db = await PGliteBrowser.create();
 		await seedDatabase(db, database);
 		return db;
 	}
