@@ -24,10 +24,7 @@ export function useChallengeLogic() {
         setIsRunning(true);
         setRunResult(null);
         setHintText('');
-        
-        // Sanitize SQL input
-        const sanitizedSQL = securityService.sanitizeHTML(challengeSQL);
-        
+
         // Check for dangerous content
         if (securityService.containsDangerousContent(challengeSQL)) {
             console.warn('Potentially dangerous SQL content detected');
@@ -42,7 +39,7 @@ export function useChallengeLogic() {
         progressStore.incrementAttempts();
 
         try {
-            const result = await runChallengeQuery(currentChallenge, sanitizedSQL);
+            const result = await runChallengeQuery(currentChallenge, challengeSQL);
             setRunResult(result);
 
             // Add to history

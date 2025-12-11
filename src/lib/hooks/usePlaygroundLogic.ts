@@ -21,10 +21,7 @@ export function usePlaygroundLogic() {
     ): Promise<void> {
         setIsPlayRunning(true);
         setPlaygroundResult(null);
-        
-        // Sanitize SQL input
-        const sanitizedSQL = securityService.sanitizeHTML(playgroundSQL);
-        
+
         // Check for dangerous content
         if (securityService.containsDangerousContent(playgroundSQL)) {
             console.warn('Potentially dangerous SQL content detected in playground');
@@ -38,7 +35,7 @@ export function usePlaygroundLogic() {
         }
 
         try {
-            const result = await runPlayground(playgroundDb, sanitizedSQL);
+            const result = await runPlayground(playgroundDb, playgroundSQL);
             setPlaygroundResult(result);
 
             // Add to history
