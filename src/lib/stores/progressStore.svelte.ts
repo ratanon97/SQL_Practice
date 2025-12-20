@@ -42,7 +42,10 @@ class ProgressStore {
 			const saved = localStorage.getItem(STORAGE_KEY);
 			if (saved) {
 				try {
-					const validation = this.securityService.validateLocalStorageData(saved, ProgressStateSchema);
+					const validation = this.securityService.validateLocalStorageData(
+						saved,
+						ProgressStateSchema
+					);
 					if (validation.success) {
 						this._state = { ...DEFAULT_PROGRESS, ...validation.data };
 					} else {

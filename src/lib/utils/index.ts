@@ -7,13 +7,13 @@ import type { TableResult } from '$lib/types';
  * @param wait The number of milliseconds to delay
  * @returns The debounced function
  */
-export function debounce<T extends (...args: any[]) => any>(
-	func: T,
+export function debounce<TArgs extends unknown[], TReturn>(
+	func: (...args: TArgs) => TReturn,
 	wait: number
-): (...args: Parameters<T>) => void {
+): (...args: TArgs) => void {
 	let timeout: ReturnType<typeof setTimeout> | null = null;
 
-	return function executedFunction(...args: Parameters<T>) {
+	return function executedFunction(...args: TArgs) {
 		const later = () => {
 			timeout = null;
 			func(...args);
@@ -115,14 +115,14 @@ export function getTodayString(): string {
  * @param wait The wait period in milliseconds
  * @returns The throttled function
  */
-export function throttle<T extends (...args: any[]) => any>(
-	func: T,
+export function throttle<TArgs extends unknown[], TReturn>(
+	func: (...args: TArgs) => TReturn,
 	wait: number
-): (...args: Parameters<T>) => void {
+): (...args: TArgs) => void {
 	let isThrottled = false;
-	let savedArgs: Parameters<T> | null = null;
+	let savedArgs: TArgs | null = null;
 
-	return function wrapper(...args: Parameters<T>) {
+	return function wrapper(...args: TArgs) {
 		if (isThrottled) {
 			savedArgs = args;
 			return;

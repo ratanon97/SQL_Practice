@@ -163,11 +163,13 @@ src/lib/
 ### 2. Dependency Flow
 
 **Before:**
+
 ```
 Main Page → Direct API Calls → Direct Store Access → Mixed Business/UI Logic
 ```
 
 **After:**
+
 ```
 Main Page → Custom Hooks → Service Layer → Stores → Clean UI Components
 ```
@@ -234,6 +236,7 @@ Main Page → Custom Hooks → Service Layer → Stores → Clean UI Components
 ### 1. API Changes
 
 **`src/routes/api/hint/+server.ts`:**
+
 - Now returns security headers
 - Implements rate limiting (10 requests/minute)
 - Validates and sanitizes all inputs
@@ -242,12 +245,14 @@ Main Page → Custom Hooks → Service Layer → Stores → Clean UI Components
 ### 2. Component Prop Changes
 
 **Removed unused props:**
+
 - `ChallengeEditor`: Removed `onSqlChange` prop
 - `Playground`: Removed `onSqlChange` prop
 
 ### 3. Store Behavior Changes
 
 **Enhanced validation:**
+
 - Invalid localStorage data now triggers automatic reset
 - Corrupted data is detected and handled gracefully
 - SQL content is sanitized before storage
@@ -257,15 +262,17 @@ Main Page → Custom Hooks → Service Layer → Stores → Clean UI Components
 ### For Existing Code
 
 1. **Update Imports:**
+
    ```typescript
    // Old imports
    import { runChallengeQuery, runPlayground } from '$lib/logic/runner';
-   
+
    // New imports (if needed)
    import { useChallengeLogic, usePlaygroundLogic } from '$lib/hooks';
    ```
 
 2. **Update Component Usage:**
+
    ```svelte
    <!-- Remove unused props -->
    <ChallengeEditor ... remove onSqlChange />
@@ -276,20 +283,22 @@ Main Page → Custom Hooks → Service Layer → Stores → Clean UI Components
    ```typescript
    // Check for rate limit errors
    if (error.status === 429) {
-     // Show user-friendly message
-     showError('Please wait a minute before trying again.');
+   	// Show user-friendly message
+   	showError('Please wait a minute before trying again.');
    }
    ```
 
 ### For New Development
 
 1. **Use Hooks for Business Logic:**
+
    ```typescript
    const { handleRunChallenge, fetchHint } = useChallengeLogic();
    const { runPlaygroundQuery } = usePlaygroundLogic();
    ```
 
 2. **Use Services for Security:**
+
    ```typescript
    const apiService = ApiService.getInstance();
    const sanitizedInput = apiService.sanitizeInput(userInput);
@@ -305,15 +314,15 @@ Main Page → Custom Hooks → Service Layer → Stores → Clean UI Components
 
 ### Before vs After
 
-| Aspect | Before | After |
-|--------|--------|-------|
-| **Rate Limiting** | ❌ None | ✅ 10 requests/minute |
-| **Input Sanitization** | ❌ Minimal | ✅ Comprehensive XSS protection |
-| **Security Headers** | ❌ None | ✅ Full CSP and security headers |
-| **Data Validation** | ❌ Basic | ✅ Zod schema validation |
-| **SQL Injection Protection** | ❌ None | ✅ Content detection and blocking |
-| **API Security** | ❌ Basic | ✅ Full request validation |
-| **LocalStorage Security** | ❌ None | ✅ Data validation and sanitization |
+| Aspect                       | Before     | After                               |
+| ---------------------------- | ---------- | ----------------------------------- |
+| **Rate Limiting**            | ❌ None    | ✅ 10 requests/minute               |
+| **Input Sanitization**       | ❌ Minimal | ✅ Comprehensive XSS protection     |
+| **Security Headers**         | ❌ None    | ✅ Full CSP and security headers    |
+| **Data Validation**          | ❌ Basic   | ✅ Zod schema validation            |
+| **SQL Injection Protection** | ❌ None    | ✅ Content detection and blocking   |
+| **API Security**             | ❌ Basic   | ✅ Full request validation          |
+| **LocalStorage Security**    | ❌ None    | ✅ Data validation and sanitization |
 
 ### Security Vulnerabilities Addressed
 
@@ -342,16 +351,19 @@ Main Page → Custom Hooks → Service Layer → Stores → Clean UI Components
 ### Verification Steps
 
 1. **Type Checking:**
+
    ```bash
    npm run check  # ✅ Passes
    ```
 
 2. **Linting:**
+
    ```bash
    npm run lint   # ✅ Passes
    ```
 
 3. **Formatting:**
+
    ```bash
    npm run format # ✅ Consistent
    ```
@@ -405,6 +417,7 @@ Main Page → Custom Hooks → Service Layer → Stores → Clean UI Components
 ## Files Modified
 
 ### New Files Created
+
 - `src/lib/services/apiService.ts`
 - `src/lib/services/securityService.ts`
 - `src/lib/hooks/useChallengeLogic.ts`
@@ -413,6 +426,7 @@ Main Page → Custom Hooks → Service Layer → Stores → Clean UI Components
 - `src/lib/hooks/index.ts`
 
 ### Files Modified
+
 - `src/routes/api/hint/+server.ts` (enhanced security)
 - `src/routes/+page.svelte` (refactored with hooks)
 - `src/lib/stores/progressStore.svelte.ts` (added validation)

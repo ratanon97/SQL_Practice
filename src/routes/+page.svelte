@@ -1,4 +1,5 @@
 <script lang="ts">
+	// Disable SSR for this page (required for PGlite browser database)
 	export const ssr = false;
 
 	import ChallengeSelector from '$lib/components/ChallengeSelector.svelte';
@@ -10,20 +11,14 @@
 	import ConceptFilter from '$lib/components/ConceptFilter.svelte';
 	import { challenges, schemaCatalog } from '$lib/data/challenges';
 	import { progressStore } from '$lib/stores/progressStore.svelte';
-	import { queryHistoryStore } from '$lib/stores/queryHistoryStore.svelte';
 	import { useChallengeLogic, usePlaygroundLogic, useConceptFilter } from '$lib/hooks';
-	import type {
-		Challenge,
-		Difficulty,
-		PlaygroundResult,
-		RunOutcome,
-		SampleDatabase
-	} from '$lib/types';
+	import type { Difficulty, PlaygroundResult, RunOutcome, SampleDatabase } from '$lib/types';
 
 	// Initialize hooks
-	const { handleRunChallenge, fetchHint, filterChallenges, resetChallengeSQL } = useChallengeLogic();
+	const { handleRunChallenge, fetchHint, filterChallenges, resetChallengeSQL } =
+		useChallengeLogic();
 	const { runPlaygroundQuery: runPlayground, handleDatabaseSwitch } = usePlaygroundLogic();
-	const { getAllConcepts, getConceptCounts, handleConceptToggle, handleClearConceptFilter, isConceptSelected } = useConceptFilter();
+	const { handleConceptToggle, handleClearConceptFilter } = useConceptFilter();
 
 	// Challenge state
 	let selectedDifficulty = $state<Difficulty>('beginner');
@@ -69,19 +64,18 @@
 
 	// Reset SQL when challenge changes using hook
 	$effect(() => {
-		resetChallengeSQL(currentChallenge, (sql) => challengeSQL = sql, 
-		                 (result) => runResult = result, 
-		                 (text) => hintText = text);
+		resetChallengeSQL(
+			currentChallenge,
+			(sql) => (challengeSQL = sql),
+			(result) => (runResult = result),
+			(text) => (hintText = text)
+		);
 	});
 
 	const schema = $derived(schemaCatalog[currentChallenge?.database ?? 'employees']);
 
 	const completionRate = $derived(progressStore.getCompletionRate(challenges.length));
 	const progress = $derived(progressStore.state);
-
-	// Get concept data for UI
-	const allConcepts = $derived(getAllConcepts(challenges));
-	const conceptCounts = $derived(getConceptCounts(challenges));
 
 	/**
 	 * Runs the current challenge and validates the result using hook
@@ -90,9 +84,9 @@
 		await handleRunChallenge(
 			currentChallenge,
 			challengeSQL,
-			(running) => isRunning = running,
-			(result) => runResult = result,
-			(text) => hintText = text
+			(running) => (isRunning = running),
+			(result) => (runResult = result),
+			(text) => (hintText = text)
 		);
 	};
 
@@ -103,8 +97,8 @@
 		await fetchHint(
 			currentChallenge,
 			challengeSQL,
-			(loading) => isHintLoading = loading,
-			(text) => hintText = text
+			(loading) => (isHintLoading = loading),
+			(text) => (hintText = text)
 		);
 	};
 
@@ -115,8 +109,8 @@
 		await runPlayground(
 			playgroundDb,
 			playgroundSQL,
-			(running) => isPlayRunning = running,
-			(result) => playgroundResult = result
+			(running) => (isPlayRunning = running),
+			(result) => (playgroundResult = result)
 		);
 	};
 
@@ -124,9 +118,10 @@
 	 * Handles database switching in playground using hook
 	 */
 	const handleDbSwitch = (database: SampleDatabase) => {
-		handleDatabaseSwitch(database, 
-			(db) => playgroundDb = db,
-			(sql) => playgroundSQL = sql
+		handleDatabaseSwitch(
+			database,
+			(db) => (playgroundDb = db),
+			(sql) => (playgroundSQL = sql)
 		);
 	};
 
@@ -134,35 +129,15 @@
 	 * Handles concept filter toggle using hook
 	 */
 	const handleConceptToggleWrapper = (concept: string) => {
-		handleConceptToggle(concept, selectedConcepts, (concepts) => selectedConcepts = concepts);
+		handleConceptToggle(concept, selectedConcepts, (concepts) => (selectedConcepts = concepts));
 	};
 
 	/**
 	 * Clears all concept filters using hook
 	 */
 	const handleClearConceptFilterWrapper = () => {
-		handleClearConceptFilter((concepts) => selectedConcepts = concepts);
+		handleClearConceptFilter((concepts) => (selectedConcepts = concepts));
 	};
-
-	/**
-	 * Checks if concept is selected using hook
-	 */
-	const isConceptSelectedWrapper = (concept: string) => {
-		return isConceptSelected(concept, selectedConcepts);
-	};
-
-	/**
-	 * Loads a query from history
-	 */
-
-
-	/**
-	 * Handles concept filter toggle
-	 */
-
-	/**
-	 * Clears all concept filters
-	 */
 
 	/**
 	 * Loads a query from history

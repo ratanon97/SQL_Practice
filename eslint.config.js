@@ -28,6 +28,13 @@ export default defineConfig(
 		}
 	},
 	{
+		files: ['src/routes/+page.svelte'],
+		rules: {
+			// Disable for root page - 'ssr' export is valid SvelteKit API
+			'svelte/valid-prop-names-in-kit-pages': 'off'
+		}
+	},
+	{
 		files: ['**/*.svelte', '**/*.svelte.ts', '**/*.svelte.js'],
 		languageOptions: {
 			parserOptions: {

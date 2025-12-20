@@ -21,7 +21,7 @@
 	</div>
 
 	<div class="space-y-3" role="list" aria-label="Database tables">
-		{#each schema as table}
+		{#each schema as table (table.table)}
 			<div class="rounded-lg border border-white/10 bg-white/5 p-3" role="listitem">
 				<div class="flex items-center justify-between gap-2">
 					<h4 class="font-semibold text-slate-100">{table.table}</h4>
@@ -33,7 +33,7 @@
 					<p class="text-xs text-slate-400 mt-1">{table.description}</p>
 				{/if}
 				<div class="flex flex-wrap gap-2 mt-2" role="list" aria-label="Table columns">
-					{#each table.columns as col}
+					{#each table.columns as col (col)}
 						<span
 							class="text-[11px] px-2 py-1 rounded-full bg-slate-900/60 border border-white/5 text-slate-200"
 							role="listitem"

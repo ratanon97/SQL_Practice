@@ -11,9 +11,10 @@
 		isRunning: boolean;
 		onDatabaseChange: (db: SampleDatabase) => void;
 		onRun: () => void;
+		onSqlChange?: (value: string) => void;
 	}
 
-	let { database, sql, result, isRunning, onDatabaseChange, onRun }: Props = $props();
+	let { database, sql, result, isRunning, onDatabaseChange, onRun, onSqlChange }: Props = $props();
 
 	const handleExport = () => {
 		if (result?.result) {
@@ -42,7 +43,7 @@
 	</div>
 
 	<!-- Editor -->
-	<Editor bind:value={sql} height="220px" {onRun} />
+	<Editor value={sql} height="220px" {onRun} onValueChange={onSqlChange} />
 
 	<!-- Actions -->
 	<div class="flex justify-between items-center flex-wrap gap-3">

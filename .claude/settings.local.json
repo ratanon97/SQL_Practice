@@ -3,5 +3,8 @@
 		"allow": ["Bash(npm run check:*)"],
 		"deny": [],
 		"ask": []
+	},
+	"enabledPlugins": {
+		"comprehensive-review@claude-code-workflows": true
 	}
 }

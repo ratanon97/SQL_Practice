@@ -45,10 +45,13 @@ class QueryHistoryStore {
 			const saved = localStorage.getItem(STORAGE_KEY);
 			if (saved) {
 				try {
-					const validation = this.securityService.validateLocalStorageData(saved, QueryHistorySchema);
+					const validation = this.securityService.validateLocalStorageData(
+						saved,
+						QueryHistorySchema
+					);
 					if (validation.success) {
 						// Sanitize SQL content for display
-						this._history = validation.data.map(entry => ({
+						this._history = validation.data.map((entry) => ({
 							...entry,
 							sql: this.securityService.sanitizeSQLForDisplay(entry.sql)
 						}));
@@ -84,7 +87,7 @@ class QueryHistoryStore {
 	addQuery(sql: string, challengeId?: string, success?: boolean): void {
 		// Sanitize SQL for display and check for dangerous content
 		const sanitizedSql = this.securityService.sanitizeSQLForDisplay(sql.trim());
-		
+
 		// Check for dangerous content
 		if (this.securityService.containsDangerousContent(sql)) {
 			console.warn('Potentially dangerous SQL content detected, sanitizing for display');

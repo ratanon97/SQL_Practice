@@ -18,13 +18,15 @@
 		placeholder = 'SELECT * FROM ...',
 		readOnly = false,
 		height = '360px',
-		onRun
+		onRun,
+		onValueChange
 	} = $props<{
 		value: string;
 		placeholder?: string;
 		readOnly?: boolean;
 		height?: string;
 		onRun?: () => void;
+		onValueChange?: (value: string) => void;
 	}>();
 
 	let container = $state<HTMLElement | null>(null);
@@ -45,7 +47,9 @@
 	const buildExtensions = () => {
 		const changeListener = EditorView.updateListener.of((update) => {
 			if (update.docChanged) {
-				value = update.state.doc.toString();
+				const newValue = update.state.doc.toString();
+				value = newValue;
+				onValueChange?.(newValue);
 			}
 		});
 

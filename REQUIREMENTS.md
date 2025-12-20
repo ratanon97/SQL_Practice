@@ -22,12 +22,14 @@ The platform empowers users to learn by doing, with intelligent guidance and ins
 ### Target Users
 
 **Primary Audience:**
+
 - Aspiring data analysts and developers learning SQL for the first time
 - Students in data science or computer science programs
 - Career changers transitioning into data-related roles
 - Professionals refreshing SQL skills after time away
 
 **Secondary Audience:**
+
 - Bootcamp instructors looking for teaching resources
 - Interviewers preparing SQL assessment questions
 - Self-learners building portfolio projects
@@ -35,6 +37,7 @@ The platform empowers users to learn by doing, with intelligent guidance and ins
 ### Core User Needs
 
 **As a learner, I want to:**
+
 1. Practice SQL without the complexity of database installation
 2. Receive immediate feedback on whether my queries are correct
 3. Get helpful guidance when stuck without being given the answer
@@ -44,6 +47,7 @@ The platform empowers users to learn by doing, with intelligent guidance and ins
 7. Access the platform from any device with a web browser
 
 **As an instructor, I want to:**
+
 1. Recommend a tool that students can use immediately without setup
 2. See realistic database schemas that mirror industry scenarios
 3. Have confidence that students are learning standard SQL syntax
@@ -82,17 +86,18 @@ The platform succeeds when:
 - **FR-1.8** MUST support multiple database contexts (employees, e-commerce, movies)
 
 **Technical Details:**
+
 ```typescript
 interface Challenge {
-  id: string;           // Unique identifier
-  title: string;        // Display name
-  prompt: string;       // User-facing instructions
-  difficulty: 'beginner' | 'intermediate' | 'advanced';
-  points: number;       // 1-15 based on difficulty
-  database: 'employees' | 'ecommerce' | 'movies';
-  starterSQL: string;   // Initial query template
-  solutionSQL: string;  // Reference solution for validation
-  concepts: string[];   // ['JOIN', 'GROUP BY', etc.]
+	id: string; // Unique identifier
+	title: string; // Display name
+	prompt: string; // User-facing instructions
+	difficulty: 'beginner' | 'intermediate' | 'advanced';
+	points: number; // 1-15 based on difficulty
+	database: 'employees' | 'ecommerce' | 'movies';
+	starterSQL: string; // Initial query template
+	solutionSQL: string; // Reference solution for validation
+	concepts: string[]; // ['JOIN', 'GROUP BY', etc.]
 }
 ```
 
@@ -113,6 +118,7 @@ interface Challenge {
 - **FR-2.9** MUST support both read (SELECT) and write (INSERT, UPDATE) operations in playground mode
 
 **Technical Details:**
+
 ```typescript
 // PGlite pooling for performance
 class PGlitePool {
@@ -129,6 +135,7 @@ interface TableResult {
 ```
 
 **Performance Targets:**
+
 - Initial database load: < 2 seconds
 - Query execution: < 500ms
 - Result rendering: < 100ms
@@ -149,6 +156,7 @@ interface TableResult {
 - **FR-3.8** MUST prevent gaming by checking query logic, not just output
 
 **Validation Logic:**
+
 1. Execute user query against challenge database
 2. Execute solution query against same database
 3. Compare column names and order
@@ -175,6 +183,7 @@ interface TableResult {
 - **FR-4.8** MUST validate hint requests to prevent abuse
 
 **Technical Details:**
+
 ```typescript
 // API endpoint: /api/hint
 POST request with:
@@ -189,6 +198,7 @@ Response: Streaming text (Server-Sent Events)
 ```
 
 **Hint Strategy:**
+
 - Identify gaps in user's query logic
 - Suggest relevant SQL concepts
 - Reference schema tables/columns
@@ -212,17 +222,19 @@ Response: Streaming text (Server-Sent Events)
 - **FR-5.9** MUST break streaks if no completion yesterday or today
 
 **Technical Details:**
+
 ```typescript
 interface ProgressState {
-  completed: Record<string, boolean>;  // Challenge ID -> completed
-  points: number;                       // Total points earned
-  streak: number;                       // Consecutive days
-  lastCompletedDate: string | null;     // ISO date string
-  attempts: number;                     // Total query runs
+	completed: Record<string, boolean>; // Challenge ID -> completed
+	points: number; // Total points earned
+	streak: number; // Consecutive days
+	lastCompletedDate: string | null; // ISO date string
+	attempts: number; // Total query runs
 }
 ```
 
 **Streak Logic:**
+
 - Increment streak when challenge completed on new day
 - Reset streak if last completion was before yesterday
 - Maintain streak if completion today or yesterday
@@ -245,6 +257,7 @@ interface ProgressState {
 - **FR-6.10** MUST resize to accommodate query length
 
 **Technical Implementation:**
+
 - CodeMirror 6 for editor functionality
 - `@codemirror/lang-sql` for SQL language support
 - `@codemirror/autocomplete` for completions
@@ -266,11 +279,12 @@ interface ProgressState {
 - **FR-7.7** MUST be collapsible to maximize screen space
 
 **Schema Information:**
+
 ```typescript
 interface SchemaCatalogEntry {
-  table: string;
-  description?: string;
-  columns: string[];
+	table: string;
+	description?: string;
+	columns: string[];
 }
 ```
 
@@ -291,13 +305,14 @@ interface SchemaCatalogEntry {
 - **FR-8.9** MUST format timestamps in human-readable form
 
 **History Entry Structure:**
+
 ```typescript
 interface HistoryEntry {
-  id: string;              // Unique identifier
-  sql: string;             // Query text
-  timestamp: string;       // ISO timestamp
-  success: boolean;        // Validation result
-  challengeId: string;     // Associated challenge
+	id: string; // Unique identifier
+	sql: string; // Query text
+	timestamp: string; // ISO timestamp
+	success: boolean; // Validation result
+	challengeId: string; // Associated challenge
 }
 ```
 
@@ -318,6 +333,7 @@ interface HistoryEntry {
 - **FR-9.9** MUST allow CSV export of results
 
 **Use Cases:**
+
 - Testing query syntax before applying to challenge
 - Exploring database relationships
 - Practicing concepts outside challenges
@@ -339,6 +355,7 @@ interface HistoryEntry {
 - **FR-10.8** MUST allow easy filter clearing
 
 **Supported Concepts:**
+
 - SELECT basics
 - WHERE clause
 - JOIN operations (INNER, LEFT, RIGHT, FULL)
@@ -370,6 +387,7 @@ interface HistoryEntry {
 - **FR-11.8** MUST work for both challenge and playground results
 
 **CSV Format:**
+
 - RFC 4180 compliant
 - UTF-8 encoding
 - Comma delimiters
@@ -393,6 +411,7 @@ interface HistoryEntry {
 - **FR-12.10** MUST show validation status (matches/doesn't match expected)
 
 **Table Features:**
+
 - Responsive design
 - Zebra striping for readability
 - Fixed header on scroll
@@ -420,12 +439,14 @@ interface HistoryEntry {
 - **NFR-1.9** MUST stream AI hints without blocking UI
 
 **Performance Targets:**
+
 - Time to Interactive (TTI): < 3 seconds
 - First Contentful Paint (FCP): < 1.5 seconds
 - Cumulative Layout Shift (CLS): < 0.1
 - Time to First Query Result: < 3 seconds total
 
 **Optimization Strategies:**
+
 - Code splitting for editor and PGlite
 - Lazy loading of non-critical components
 - Instance pooling (2 per database type)
@@ -450,6 +471,7 @@ interface HistoryEntry {
 - **NFR-2.10** MUST announce dynamic content changes via live regions
 
 **Keyboard Shortcuts:**
+
 - `Cmd/Ctrl+Enter`: Execute query
 - `Tab`: Navigate between elements
 - `Enter`: Activate buttons
@@ -457,6 +479,7 @@ interface HistoryEntry {
 - `Arrow keys`: Navigate lists
 
 **Screen Reader Support:**
+
 - Proper heading hierarchy (h1 → h2 → h3)
 - Form labels associated with inputs
 - Button labels describe action
@@ -481,6 +504,7 @@ interface HistoryEntry {
 - **NFR-3.10** MUST maintain context when switching between challenges
 
 **UX Principles:**
+
 - Progressive disclosure (advanced features hidden initially)
 - Immediate feedback (no delayed responses)
 - Forgiving design (easy undo/retry)
@@ -504,6 +528,7 @@ interface HistoryEntry {
 - **NFR-4.9** MUST exclude sensitive files from version control
 
 **Security Considerations:**
+
 - PGlite runs in WASM sandbox (isolated from system)
 - LocalStorage contains only user progress (no sensitive data)
 - API key never sent to client
@@ -511,6 +536,7 @@ interface HistoryEntry {
 - No server-side query execution (eliminates SQL injection risk)
 
 **Content Security Policy:**
+
 ```
 default-src 'self';
 script-src 'self' 'wasm-unsafe-eval';
@@ -535,12 +561,14 @@ connect-src 'self' https://api.anthropic.com;
 - **NFR-5.9** MUST handle PGlite errors without crashing app
 
 **Error Recovery:**
+
 - Automatic retry for transient failures
 - Clear error messages with recovery steps
 - Fallback to default state when data corrupted
 - Graceful degradation when features unavailable
 
 **Data Persistence:**
+
 - Debounced writes (500ms) to prevent excessive I/O
 - Validation on read to detect corruption
 - Automatic cleanup of old history entries
@@ -564,6 +592,7 @@ connect-src 'self' https://api.anthropic.com;
 - **NFR-6.10** MUST include contributing guidelines
 
 **Code Quality Standards:**
+
 - ESLint for linting
 - Prettier for formatting
 - TypeScript for type safety
@@ -571,6 +600,7 @@ connect-src 'self' https://api.anthropic.com;
 - Playwright for E2E testing
 
 **Architecture Principles:**
+
 - Component modularity (< 150 lines each)
 - Single responsibility principle
 - Clear separation of concerns
@@ -593,6 +623,7 @@ connect-src 'self' https://api.anthropic.com;
 - **NFR-7.8** MUST work without JavaScript frameworks on client (progressive enhancement)
 
 **Browser Requirements:**
+
 - WebAssembly support (for PGlite)
 - ES2020+ JavaScript support
 - LocalStorage API
@@ -600,6 +631,7 @@ connect-src 'self' https://api.anthropic.com;
 - CSS Grid and Flexbox
 
 **Responsive Breakpoints:**
+
 - Mobile: 320px - 767px
 - Tablet: 768px - 1023px
 - Desktop: 1024px+
@@ -620,12 +652,14 @@ connect-src 'self' https://api.anthropic.com;
 - **NFR-8.8** MUST mock external dependencies (AI API, localStorage)
 
 **Testing Strategy:**
+
 - Unit tests: Vitest for logic functions
 - Component tests: Testing Library + Vitest
 - E2E tests: Playwright for user flows
 - Visual tests: Manual review (future: automated)
 
 **Critical Test Scenarios:**
+
 - Query execution and validation
 - Progress tracking and persistence
 - Challenge completion flow
@@ -640,38 +674,46 @@ connect-src 'self' https://api.anthropic.com;
 ### Tech Stack
 
 **Frontend Framework:**
+
 - SvelteKit 2.48+ (full-stack framework)
 - Svelte 5.43+ (UI framework with runes)
 
 **Styling:**
+
 - UnoCSS 66.5+ (atomic CSS, Tailwind-compatible)
 - Custom CSS for component-specific styles
 
 **Database:**
+
 - PGlite 0.3.14+ (PostgreSQL WASM)
 - In-browser, zero-config
 
 **Code Editor:**
+
 - CodeMirror 6.38+
 - SQL language support
 - Autocomplete
 - One Dark theme
 
 **AI Integration:**
+
 - Vercel AI SDK 5.0+
 - Anthropic Claude 3.5 Sonnet
 - Streaming responses
 
 **Type Safety:**
+
 - TypeScript 5.9+ (strict mode)
 - Zod 4.1+ for runtime validation
 
 **Testing:**
+
 - Vitest 4.0+ (unit/component tests)
 - Playwright 1.57+ (E2E tests)
 - Testing Library 5.2+ (component testing)
 
 **Development:**
+
 - Vite 7.2+ (build tool)
 - ESLint 9+ (linting)
 - Prettier 3.6+ (formatting)
@@ -679,62 +721,67 @@ connect-src 'self' https://api.anthropic.com;
 ### Data Models
 
 **Challenges:**
+
 ```typescript
 interface Challenge {
-  id: string;
-  title: string;
-  prompt: string;
-  difficulty: 'beginner' | 'intermediate' | 'advanced';
-  points: number;
-  database: 'employees' | 'ecommerce' | 'movies';
-  starterSQL: string;
-  solutionSQL: string;
-  concepts: string[];
+	id: string;
+	title: string;
+	prompt: string;
+	difficulty: 'beginner' | 'intermediate' | 'advanced';
+	points: number;
+	database: 'employees' | 'ecommerce' | 'movies';
+	starterSQL: string;
+	solutionSQL: string;
+	concepts: string[];
 }
 ```
 
 **Progress:**
+
 ```typescript
 interface ProgressState {
-  completed: Record<string, boolean>;
-  points: number;
-  streak: number;
-  lastCompletedDate: string | null;
-  attempts: number;
+	completed: Record<string, boolean>;
+	points: number;
+	streak: number;
+	lastCompletedDate: string | null;
+	attempts: number;
 }
 ```
 
 **Query History:**
+
 ```typescript
 interface HistoryEntry {
-  id: string;
-  sql: string;
-  timestamp: string;
-  success: boolean;
-  challengeId: string;
+	id: string;
+	sql: string;
+	timestamp: string;
+	success: boolean;
+	challengeId: string;
 }
 ```
 
 **Query Results:**
+
 ```typescript
 interface TableResult {
-  fields: string[];
-  rows: Record<string, unknown>[];
+	fields: string[];
+	rows: Record<string, unknown>[];
 }
 
 interface RunOutcome {
-  ok: boolean;
-  matches?: boolean;
-  actual?: TableResult;
-  expected?: TableResult;
-  error?: string;
-  durationMs?: number;
+	ok: boolean;
+	matches?: boolean;
+	actual?: TableResult;
+	expected?: TableResult;
+	error?: string;
+	durationMs?: number;
 }
 ```
 
 ### Database Schemas
 
 **Employees Database:**
+
 ```sql
 departments (dept_no, dept_name)
 employees (emp_no, first_name, last_name, hire_date, salary)
@@ -744,6 +791,7 @@ salaries (emp_no, salary, from_date, to_date)
 ```
 
 **E-commerce Database:**
+
 ```sql
 customers (customer_id, name, email, join_date)
 products (product_id, name, category, price, stock)
@@ -752,6 +800,7 @@ order_items (order_item_id, order_id, product_id, quantity, price)
 ```
 
 **Movies Database:**
+
 ```sql
 movies (movie_id, title, year, rating, revenue)
 actors (actor_id, name, birth_year)
@@ -762,14 +811,15 @@ movie_actors (movie_id, actor_id, character_name)
 ### API Endpoints
 
 **POST /api/hint**
+
 - Purpose: Generate AI-powered hints for challenges
 - Request body:
   ```typescript
   {
-    challengeTitle: string;
-    prompt: string;
-    userQuery: string;
-    schemaInfo: string;
+  	challengeTitle: string;
+  	prompt: string;
+  	userQuery: string;
+  	schemaInfo: string;
   }
   ```
 - Response: Server-Sent Events (streaming text)
@@ -779,10 +829,12 @@ movie_actors (movie_id, actor_id, character_name)
 ### State Management
 
 **Svelte 5 Stores:**
+
 - `progressStore`: Global progress tracking
 - `queryHistoryStore`: Query execution history
 
 **Component State:**
+
 - Local runes for UI state
 - Props for parent-child communication
 - Event dispatching for child-parent communication
@@ -836,32 +888,33 @@ tests/
 
 ### Core Dependencies
 
-| Package | Version | Purpose |
-|---------|---------|---------|
-| svelte | ^5.43.8 | UI framework |
-| @sveltejs/kit | ^2.48.5 | Full-stack framework |
-| @electric-sql/pglite | ^0.3.14 | PostgreSQL WASM |
-| @codemirror/view | ^6.38.8 | Code editor core |
-| @codemirror/lang-sql | ^6.10.0 | SQL syntax support |
-| @ai-sdk/anthropic | ^2.0.53 | Anthropic integration |
-| ai | ^5.0.108 | AI SDK core |
-| unocss | ^66.5.10 | Utility CSS |
-| zod | ^4.1.13 | Schema validation |
-| typescript | ^5.9.3 | Type system |
+| Package              | Version  | Purpose               |
+| -------------------- | -------- | --------------------- |
+| svelte               | ^5.43.8  | UI framework          |
+| @sveltejs/kit        | ^2.48.5  | Full-stack framework  |
+| @electric-sql/pglite | ^0.3.14  | PostgreSQL WASM       |
+| @codemirror/view     | ^6.38.8  | Code editor core      |
+| @codemirror/lang-sql | ^6.10.0  | SQL syntax support    |
+| @ai-sdk/anthropic    | ^2.0.53  | Anthropic integration |
+| ai                   | ^5.0.108 | AI SDK core           |
+| unocss               | ^66.5.10 | Utility CSS           |
+| zod                  | ^4.1.13  | Schema validation     |
+| typescript           | ^5.9.3   | Type system           |
 
 ### Development Dependencies
 
-| Package | Version | Purpose |
-|---------|---------|---------|
-| vitest | ^4.0.15 | Unit testing |
-| @playwright/test | ^1.57.0 | E2E testing |
-| eslint | ^9.39.1 | Linting |
-| prettier | ^3.6.2 | Code formatting |
-| @testing-library/svelte | ^5.2.9 | Component testing |
+| Package                 | Version | Purpose           |
+| ----------------------- | ------- | ----------------- |
+| vitest                  | ^4.0.15 | Unit testing      |
+| @playwright/test        | ^1.57.0 | E2E testing       |
+| eslint                  | ^9.39.1 | Linting           |
+| prettier                | ^3.6.2  | Code formatting   |
+| @testing-library/svelte | ^5.2.9  | Component testing |
 
 ### External Services
 
 **Anthropic API:**
+
 - Endpoint: `https://api.anthropic.com`
 - Model: Claude 3.5 Sonnet
 - Purpose: AI hint generation
@@ -873,26 +926,30 @@ tests/
 
 ### Environment Variables
 
-| Variable | Required | Description | Default |
-|----------|----------|-------------|---------|
-| `ANTHROPIC_API_KEY` | No | Anthropic API key for AI hints | - |
+| Variable            | Required | Description                    | Default |
+| ------------------- | -------- | ------------------------------ | ------- |
+| `ANTHROPIC_API_KEY` | No       | Anthropic API key for AI hints | -       |
 
 ### Configuration Files
 
 **.env.example:**
+
 ```
 ANTHROPIC_API_KEY=your_api_key_here
 ```
 
 **svelte.config.js:**
+
 - Adapter configuration
 - Preprocessor setup
 
 **vite.config.ts:**
+
 - Build configuration
 - Plugin setup
 
 **unocss.config.ts:**
+
 - CSS utility configuration
 - Preset setup
 
@@ -905,27 +962,32 @@ ANTHROPIC_API_KEY=your_api_key_here
 **Platform:** Vercel (recommended), Netlify, Node.js server, or static hosting
 
 **Build Process:**
+
 ```bash
 npm install
 npm run build
 ```
 
 **Build Output:**
+
 - `.svelte-kit/output` - Server and client bundles
 - Adapter-specific output structure
 
 **Environment Variables:**
+
 - Set `ANTHROPIC_API_KEY` in deployment platform
 - Required for AI hints feature
 
 ### Performance Requirements
 
 **Bundle Size:**
+
 - Initial JS: < 200KB gzipped
 - PGlite WASM: ~2MB (lazy loaded)
 - Total transfer: < 3MB
 
 **Caching Strategy:**
+
 - Static assets: 1 year cache
 - API responses: No cache (dynamic)
 - PGlite WASM: 1 month cache
@@ -933,6 +995,7 @@ npm run build
 ### Monitoring
 
 **Recommended Metrics:**
+
 - Page load time (Target: < 2s)
 - Time to interactive (Target: < 3s)
 - Query execution time (Target: < 500ms)
@@ -1035,41 +1098,22 @@ The following features are not included in current requirements but may be consi
 The project meets requirements when:
 
 **Core Functionality:**
+
 1. ✅ User can complete a SQL challenge end-to-end within 2 minutes of landing
 2. ✅ Query results are validated accurately against expected output
 3. ✅ Progress persists across browser sessions
 4. ✅ AI hints provide helpful guidance without giving away answers
 5. ✅ All 30+ challenges load and execute correctly
 
-**User Experience:**
-6. ✅ Code editor provides syntax highlighting and keyboard shortcuts
-7. ✅ Schema explorer shows all tables and columns for current database
-8. ✅ Query history tracks all executions with timestamps
-9. ✅ Playground mode allows free-form SQL experimentation
-10. ✅ CSV export generates valid downloadable files
+**User Experience:** 6. ✅ Code editor provides syntax highlighting and keyboard shortcuts 7. ✅ Schema explorer shows all tables and columns for current database 8. ✅ Query history tracks all executions with timestamps 9. ✅ Playground mode allows free-form SQL experimentation 10. ✅ CSV export generates valid downloadable files
 
-**Technical Quality:**
-11. ✅ All TypeScript strict mode checks pass
-12. ✅ Test coverage exceeds 70%
-13. ✅ All E2E tests pass on Chrome, Firefox, Safari
-14. ✅ Page loads in under 2 seconds on 3G
-15. ✅ Queries execute in under 500ms
+**Technical Quality:** 11. ✅ All TypeScript strict mode checks pass 12. ✅ Test coverage exceeds 70% 13. ✅ All E2E tests pass on Chrome, Firefox, Safari 14. ✅ Page loads in under 2 seconds on 3G 15. ✅ Queries execute in under 500ms
 
-**Accessibility:**
-16. ✅ WCAG 2.1 AA compliance verified
-17. ✅ Full keyboard navigation functional
-18. ✅ Screen reader announces all dynamic content
-19. ✅ Color contrast meets 4.5:1 minimum
+**Accessibility:** 16. ✅ WCAG 2.1 AA compliance verified 17. ✅ Full keyboard navigation functional 18. ✅ Screen reader announces all dynamic content 19. ✅ Color contrast meets 4.5:1 minimum
 
-**Documentation:**
-20. ✅ README provides complete setup instructions
-21. ✅ CONTRIBUTING guide explains development workflow
-22. ✅ All public functions have JSDoc comments
-23. ✅ Environment variables documented
+**Documentation:** 20. ✅ README provides complete setup instructions 21. ✅ CONTRIBUTING guide explains development workflow 22. ✅ All public functions have JSDoc comments 23. ✅ Environment variables documented
 
-**Deployment:**
-24. ✅ Application builds without errors
-25. ✅ Deployed to Vercel with AI hints functional
+**Deployment:** 24. ✅ Application builds without errors 25. ✅ Deployed to Vercel with AI hints functional
 
 ---
 
@@ -1080,4 +1124,3 @@ The project meets requirements when:
 - **Project:** SQL Dojo
 - **Status:** Active Development
 - **Maintained By:** SQL Dojo Team
-

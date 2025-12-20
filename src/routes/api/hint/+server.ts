@@ -20,7 +20,7 @@ const HintRequestSchema = z.object({
 export const POST: RequestHandler = async ({ request }) => {
 	// Initialize API service
 	const apiService = ApiService.getInstance();
-	
+
 	// Validate API key is configured
 	if (!env.ANTHROPIC_API_KEY) {
 		throw error(500, 'API key not configured. Please set ANTHROPIC_API_KEY environment variable.');
@@ -28,7 +28,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 	// Validate and sanitize request using API service
 	const validationResult = await apiService.validateRequest(request, HintRequestSchema, 'hint');
-	
+
 	if (!validationResult.success) {
 		throw error(400, validationResult.error);
 	}
@@ -55,7 +55,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		// Apply security headers to response
 		const headers = apiService.getSecurityHeaders();
 		const streamResponse = response.toTextStreamResponse();
-		
+
 		// Add security headers to the response
 		Object.entries(headers).forEach(([key, value]) => {
 			streamResponse.headers.set(key, value);

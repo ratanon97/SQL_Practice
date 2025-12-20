@@ -2,38 +2,31 @@ import { PGlite } from '@electric-sql/pglite';
 
 // Configure PGlite to use browser-compatible filesystem
 // This ensures it works in browser environments without Node.js APIs
-let pgliteInstance: typeof PGlite;
+let pgliteInitialized: Promise<typeof PGlite> | null = null;
 
-async function initializePGlite(): Promise<typeof PGlite> {
-    try {
-        // Check if we're in a browser environment
-        if (typeof window !== 'undefined') {
-            // In browser environment, try to use PGlite directly
-            // PGlite should automatically use browser-compatible filesystem
-            return PGlite;
-        } else {
-            // In Node.js environment, use regular import
-            return PGlite;
-        }
-    } catch (error) {
-        console.warn('PGlite initialization warning:', error);
-        // Fallback to regular import
-        return PGlite;
-    }
+async function ensurePGliteInitialized(): Promise<typeof PGlite> {
+	if (!pgliteInitialized) {
+		pgliteInitialized = (async () => {
+			try {
+				// Check if we're in a browser environment
+				if (typeof window !== 'undefined') {
+					// In browser environment, try to use PGlite directly
+					// PGlite should automatically use browser-compatible filesystem
+					console.log('PGlite initialized successfully');
+					return PGlite;
+				} else {
+					// In Node.js environment, use regular import
+					return PGlite;
+				}
+			} catch (error) {
+				console.warn('PGlite initialization warning:', error);
+				// Fallback to regular import
+				return PGlite;
+			}
+		})();
+	}
+	return pgliteInitialized;
 }
-
-// Initialize PGlite and use the configured instance
-let PGliteBrowser: typeof PGlite = PGlite;
-
-// Try to initialize PGlite properly
-initializePGlite().then((instance) => {
-    PGliteBrowser = instance;
-    console.log('PGlite initialized successfully');
-}).catch((error) => {
-    console.error('Failed to initialize PGlite:', error);
-    // Fallback to basic PGlite import
-    PGliteBrowser = PGlite;
-});
 import { databaseSeeds } from '$lib/data/challenges';
 import type {
 	Challenge,
@@ -103,10 +96,13 @@ const seedDatabase = async (db: PGlite, database: SampleDatabase): Promise<void>
 /**
  * PGlite instance pool for reusing database connections
  * This significantly improves performance by avoiding repeated WASM initialization
+ * Now includes memory limits to prevent unbounded growth
  */
 class PGlitePool {
 	private pools: Map<SampleDatabase, PGlite[]> = new Map();
 	private readonly maxPoolSize = 2; // Keep 2 instances per database
+	private totalInstances = 0;
+	private readonly maxTotalInstances = 10; // Global limit across all databases
 
 	/**
 	 * Get or create a PGlite instance for a database
@@ -123,8 +119,17 @@ class PGlitePool {
 			return db;
 		}
 
+		// Enforce global instance limit
+		if (this.totalInstances >= this.maxTotalInstances) {
+			throw new Error(
+				'Database pool exhausted. Too many concurrent operations. Please wait and try again.'
+			);
+		}
+
 		// Create new instance if pool is empty
+		const PGliteBrowser = await ensurePGliteInitialized();
 		const db = await PGliteBrowser.create();
+		this.totalInstances++;
 		await seedDatabase(db, database);
 		return db;
 	}
@@ -140,8 +145,9 @@ class PGlitePool {
 			pool.push(db);
 			this.pools.set(database, pool);
 		} else {
-			// Close excess instances
+			// Close excess instances and decrement counter
 			await db.close();
+			this.totalInstances--;
 		}
 	}
 
@@ -153,6 +159,21 @@ class PGlitePool {
 			await Promise.all(pool.map((db) => db.close()));
 		}
 		this.pools.clear();
+		this.totalInstances = 0;
+	}
+
+	/**
+	 * Get pool statistics for monitoring
+	 */
+	getStats() {
+		return {
+			totalInstances: this.totalInstances,
+			maxTotalInstances: this.maxTotalInstances,
+			poolSizes: Array.from(this.pools.entries()).map(([db, pool]) => ({
+				database: db,
+				size: pool.length
+			}))
+		};
 	}
 }
 

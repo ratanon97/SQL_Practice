@@ -14,6 +14,7 @@
 		onRun: () => void;
 		onReset: () => void;
 		onHintRequest: () => void;
+		onSqlChange?: (value: string) => void;
 	}
 
 	let {
@@ -25,7 +26,8 @@
 		hintText,
 		onRun,
 		onReset,
-		onHintRequest
+		onHintRequest,
+		onSqlChange
 	}: Props = $props();
 
 	const handleExportActual = () => {
@@ -33,8 +35,6 @@
 			exportToCSV(runResult.actual, `${challenge.id}-result.csv`);
 		}
 	};
-
-
 </script>
 
 <div class="card p-5 border-white/10 space-y-4">
@@ -65,7 +65,7 @@
 	</div>
 
 	<!-- Editor -->
-	<Editor bind:value={sql} height="320px" {onRun} />
+	<Editor value={sql} height="320px" {onRun} onValueChange={onSqlChange} />
 
 	<!-- Actions and status -->
 	<div class="flex flex-wrap gap-3 items-center">
