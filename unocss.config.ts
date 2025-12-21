@@ -8,7 +8,7 @@ import {
 
 export default defineConfig({
 	shortcuts: {
-		card: 'rounded-xl border border-white/10 bg-white/5 backdrop-blur-md shadow-lg shadow-black/30',
+		card: 'rounded-xl border border-white/10 bg-white/5 backdrop-blur-md shadow-lg shadow-black/30 isolate',
 		btn: 'inline-flex items-center gap-2 rounded-lg px-4 py-2 font-semibold transition-all duration-200',
 		'btn-primary':
 			'btn bg-gradient-to-r from-cyan-400 to-emerald-400 text-slate-900 hover:from-cyan-300 hover:to-emerald-300',

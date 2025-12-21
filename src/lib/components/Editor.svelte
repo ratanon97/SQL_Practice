@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import { autocompletion } from '@codemirror/autocomplete';
 	import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirror/commands';
 	import { defaultHighlightStyle, syntaxHighlighting } from '@codemirror/language';
@@ -30,7 +31,9 @@
 	}>();
 
 	let container = $state<HTMLElement | null>(null);
-	let view = $state<EditorView | null>(null);
+	let view: EditorView | null = null;
+	// Use a plain variable (not reactive) to track sync state
+	let isSyncingFromEditor = false;
 
 	const baseExtensions: Extension[] = [
 		sql(),
@@ -48,8 +51,14 @@
 		const changeListener = EditorView.updateListener.of((update) => {
 			if (update.docChanged) {
 				const newValue = update.state.doc.toString();
+				// Set flag to prevent sync effect from running
+				isSyncingFromEditor = true;
 				value = newValue;
 				onValueChange?.(newValue);
+				// Reset flag after microtask
+				queueMicrotask(() => {
+					isSyncingFromEditor = false;
+				});
 			}
 		});
 
@@ -75,12 +84,16 @@
 		];
 	};
 
+	// Effect to create/recreate the editor when container is available
 	$effect(() => {
 		if (!container) return;
 
+		// Read value once for initialization
+		const initialValue = untrack(() => value);
+
 		view?.destroy();
 		const state = EditorState.create({
-			doc: value,
+			doc: initialValue,
 			extensions: buildExtensions()
 		});
 
@@ -89,15 +102,25 @@
 			parent: container
 		});
 
-		return () => view?.destroy();
+		return () => {
+			view?.destroy();
+			view = null;
+		};
 	});
 
+	// Effect to sync external value changes to the editor
 	$effect(() => {
+		// Read value to create dependency
+		const currentValue = value;
+
+		// Skip if this change came from the editor itself
+		if (isSyncingFromEditor) return;
 		if (!view) return;
+
 		const currentDoc = view.state.doc.toString();
-		if (value !== currentDoc) {
+		if (currentValue !== currentDoc) {
 			view.dispatch({
-				changes: { from: 0, to: currentDoc.length, insert: value }
+				changes: { from: 0, to: currentDoc.length, insert: currentValue }
 			});
 		}
 	});

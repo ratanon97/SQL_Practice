@@ -1,31 +1,33 @@
 import { PGlite } from '@electric-sql/pglite';
 
-// Configure PGlite to use browser-compatible filesystem
-// This ensures it works in browser environments without Node.js APIs
-let pgliteInitialized: Promise<typeof PGlite> | null = null;
+// Lock to serialize PGlite instance creation.
+// This prevents the "Cannot compile WebAssembly.Module from an already read Response" error
+// that occurs when multiple PGlite instances try to load the WASM module concurrently.
+let creationQueue: Promise<PGlite> = Promise.resolve(null as unknown as PGlite);
 
-async function ensurePGliteInitialized(): Promise<typeof PGlite> {
-	if (!pgliteInitialized) {
-		pgliteInitialized = (async () => {
-			try {
-				// Check if we're in a browser environment
-				if (typeof window !== 'undefined') {
-					// In browser environment, try to use PGlite directly
-					// PGlite should automatically use browser-compatible filesystem
-					console.log('PGlite initialized successfully');
-					return PGlite;
-				} else {
-					// In Node.js environment, use regular import
-					return PGlite;
-				}
-			} catch (error) {
-				console.warn('PGlite initialization warning:', error);
-				// Fallback to regular import
-				return PGlite;
-			}
-		})();
-	}
-	return pgliteInitialized;
+/**
+ * Creates a new PGlite instance with serialized initialization.
+ * Each instance creation waits for the previous one to complete,
+ * ensuring the WASM module is fully loaded before starting another.
+ */
+async function createPGliteInstance(): Promise<PGlite> {
+	// Chain this creation onto the queue to serialize all instance creations
+	const previousCreation = creationQueue;
+
+	const newCreation = (async () => {
+		// Wait for any previous creation to finish
+		await previousCreation.catch(() => {});
+
+		// Small delay to ensure previous instance is fully initialized
+		await new Promise((resolve) => setTimeout(resolve, 50));
+
+		const db = await PGlite.create();
+		console.log('PGlite instance created successfully');
+		return db;
+	})();
+
+	creationQueue = newCreation;
+	return newCreation;
 }
 import { databaseSeeds } from '$lib/data/challenges';
 import type {
@@ -127,8 +129,7 @@ class PGlitePool {
 		}
 
 		// Create new instance if pool is empty
-		const PGliteBrowser = await ensurePGliteInitialized();
-		const db = await PGliteBrowser.create();
+		const db = await createPGliteInstance();
 		this.totalInstances++;
 		await seedDatabase(db, database);
 		return db;

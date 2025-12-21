@@ -15,13 +15,13 @@
 	<title>SQL Dojo · Interactive SQL Practice</title>
 </svelte:head>
 
-<div class="min-h-screen bg-bg text-slate-100 font-display relative overflow-hidden">
-	<div class="pointer-events-none absolute inset-0 -z-10">
+<div class="min-h-screen bg-bg text-slate-100 font-display">
+	<div class="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
 		<div class="absolute -left-40 top-10 h-80 w-80 rounded-full bg-cyan-500/20 blur-3xl"></div>
 		<div class="absolute right-0 top-32 h-72 w-72 rounded-full bg-emerald-400/15 blur-3xl"></div>
 		<div
 			class="absolute bottom-10 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-sky-400/10 blur-3xl"
 		></div>
 	</div>
-	<main class="relative z-0 max-w-7xl mx-auto px-6 py-10 md:py-14">{@render children()}</main>
+	<main class="relative max-w-7xl mx-auto px-6 py-10 md:py-14">{@render children()}</main>
 </div>
