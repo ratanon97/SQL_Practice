@@ -4,9 +4,6 @@
 	"installCommand": "npm install",
 	"framework": "sveltekit",
 	"outputDirectory": ".svelte-kit/output",
-	"env": {
-		"ANTHROPIC_API_KEY": "@anthropic_api_key"
-	},
 	"headers": [
 		{
 			"source": "/(.*)",
